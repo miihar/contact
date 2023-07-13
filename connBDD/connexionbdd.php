@@ -25,14 +25,10 @@ class MaConnexion{
     }
 
     //fonction pour selectionner des elements dans la bdd
-    public function selectSalle($table){
+    public function selectContact($table){
         try {
-            $requete = "SELECT * from $table /*where identifiant = :identifiant and mot_de_passe = :mdp*/";
+            $requete = "SELECT * from $table";
             $requete_preparee = $this->connexionPDO->prepare($requete);
-            /*  
-                $requete_preparee->bindParam(":identifiant", $identifiant,PDO::PARAM_STR);
-                $requete_preparee->bindParam(":mdp", $password,PDO::PARAM_STR);
-            */
             $resultat = $requete_preparee->execute();
             $resultat = $requete_preparee->fetchAll(PDO::FETCH_ASSOC);
 
@@ -43,15 +39,15 @@ class MaConnexion{
         }
     }
 
-    public function insertionClient($nom,$prenom,$mail){
+    public function insertionContact($nom,$prenom,$tel){
         try {
-            $requete = " INSERT INTO client(Nom, Prenom, Mail) 
-                VALUES (:Nom, :Prenom, :Mail)" ;
+            $requete = " INSERT INTO contact(Nom, Prenom, Numero) 
+                VALUES (:Nom, :Prenom, :Numero)" ;
             $requete_preparee = $this->connexionPDO->prepare($requete);
 
             $requete_preparee->bindParam(':Nom',$nom,PDO::PARAM_STR,30);
             $requete_preparee->bindParam(':Prenom',$prenom,PDO::PARAM_STR,50);
-            $requete_preparee->bindParam(':Mail',$mail,PDO::PARAM_STR);
+            $requete_preparee->bindParam(':Numero',$tel,PDO::PARAM_INT,10);
 
             $requete_preparee->execute();
             echo ("insertion reussi");
@@ -63,15 +59,19 @@ class MaConnexion{
     }
 
     // Fonction de mis à jour du statut de la salle dans la table Salle 
-    public function maj_Statut($nomSalle){
+    public function maj_contact($contactName,$contactPrenom,$contactNum, $id){
         try {
 
-            $requete = "UPDATE salle SET Statut_Salle = 'RES' 
-                WHERE Nom_salle = ?";
+            $requete = "UPDATE contact 
+                SET Nom = ?, Prenom = ?, Numero = ?
+                WHERE ID_Contact = $id ";
 
             $requete_preparee = $this->connexionPDO->prepare($requete);
 
-            $requete_preparee->bindvalue(1,$nomSalle,PDO::PARAM_STR);
+            $requete_preparee->bindValue(1,$contactName,PDO::PARAM_STR);
+            $requete_preparee->bindValue(2,$contactPrenom,PDO::PARAM_STR);
+            $requete_preparee->bindValue(3,$contactNum,PDO::PARAM_STR);
+
 
             $requete_preparee->execute();
 
@@ -83,13 +83,11 @@ class MaConnexion{
         }
     }
 
-    public function deleteReserv($nomSalle){
+    public function deleteContact($id){
         try{
-            $requete = "UPDATE salle SET Statut_Salle = 'LIB'
-            WHERE Nom_salle = ?";
+            $requete = "DELETE FROM contact WHERE ID_Contact = $id";
             $requete_preparee = $this->connexionPDO->prepare($requete);
 
-            $requete_preparee->bindvalue(1,$nomSalle,PDO::PARAM_STR);
             $requete_preparee->execute();
             echo 'modification reussie';
             return $requete_preparee;
@@ -100,13 +98,14 @@ class MaConnexion{
     }
 }
 
-/*
-$test = new MaConnexion("reservsalle", "", "root", "localhost");
 
-$inser = $test->insertionClient("doe","john","mail@mail.co");
-var_dump($inser);
-$sallee = $test->maj_Statut("Salle Madrid");
-var_dump($sallee);
-*/
+
+
+//$inser = $test->insertionContact("doe","john","mail@mail.co");
+//var_dump($inser);
+
+// $sallee = $test->maj_contact("doe","john","9000123452");
+// var_dump($sallee);
+
 
 ?>
